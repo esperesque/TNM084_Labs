@@ -90,6 +90,12 @@ GLuint indices2[] = {	0,3,2, 0,2,1};
 
 // THIS IS WHERE YOUR WORK GOES!
 
+// TREE PARAMETERS
+const int MAX_DEPTH = 6;
+const int MIN_DEPTH = 1;
+const float BRANCH_SCALE = 0.5;
+const vec2 BRANCH_DENSITY = vec2(0.1, 0.9); // The vec2 stores a range
+
 long long seed = 12744274;
 
 // Uses Blum Blum Shub to generate a random float in the range [0, 1]
@@ -108,6 +114,11 @@ float rand_ang(){
     return(pi * 2 * randf());
 }
 
+float rand_range(float a, float b){
+    return(randf() * (b-a) + a);
+}
+
+// Test function to confirm that the RNG has even distribution over the range [0, 1]
 void TestRng(int iterations){
     int over = 0;
     int under = 0;
@@ -125,23 +136,35 @@ void TestRng(int iterations){
     std::cout << "Values between 0.0 and 0.1: " << under << "\n";
 }
 
-void MakeBranch(int depth, int variation){
-    // Rescale
-    gluggScale(0.75, 0.75, 0.75);
-    // Tilt the branch
-    gluggRotate(0.4, 1.0, 0.0, 0.0);
-    // Rotate around x-axis
-    gluggRotate(1.5*variation, 0.0, 1.0, 0.0);
-    MakeCylinderAlt(20, 2, 0.2, 0.2);
+// Make a random branch at a given height
+void MakeBranch(float height, int depth){
+    float scale = 5.0/height; // Scale the branch with position on the tree
+    float branch_length = rand_range(0.5, 1.2) * scale; // 2.5-1
+    branch_length = min(branch_length, 3.0);
+    float branch_tilt = rand_range(3.14/3, 3.14/2);
 
-    gluggTranslate(0, 1.8, 0.0);
+    // Rotation around the y-axis (trunk)
+    gluggRotate(rand_ang(), 0, 1.0, 0);
+    // Angle branch
+    gluggRotate(branch_tilt, 1.0, 0, 0);
+    MakeCylinderAlt(20, branch_length, 0.05, 0.1);
 
-    int new_depth = depth - 1;
-    if(new_depth >= 0){
-        for(int i = 0; i < 4; i++){
+    if(depth > 0){
+        // Make another branch
+
+        float sub_branch = 0.2;
+
+        while(true){
             gluggPushMatrix();
-            MakeBranch(new_depth, i);
+            gluggTranslate(0,sub_branch,0);
+            gluggScale(BRANCH_SCALE, BRANCH_SCALE, BRANCH_SCALE);
+            MakeBranch(1.0, depth-(int)rand_range(1, 3));
             gluggPopMatrix();
+
+            sub_branch += rand_range(BRANCH_DENSITY.x, BRANCH_DENSITY.y);
+            if(sub_branch >= branch_length){
+                break;
+            }
         }
     }
 }
@@ -157,7 +180,9 @@ gluggModel MakeTree()
     // Try to make a tree without loops/recursion to figure out the logic
 
     // rand test
-    TestRng(500);
+    // TestRng(500);
+
+    // Make the trunk of the tree
 
     MakeCylinderAlt(20, 2, 0.2, 0.2);
     gluggPushMatrix();
@@ -165,6 +190,23 @@ gluggModel MakeTree()
     MakeCylinderAlt(20, 3, 0.1, 0.2);
     gluggPopMatrix();
 
+    // Draw the rest of the owl
+
+    float tree_height = 5.0;
+    float branch_height = 1.5;
+    while(true){
+        gluggPushMatrix();
+        gluggTranslate(0,branch_height, 0);
+        MakeBranch(branch_height, (int)rand_range(MIN_DEPTH, MAX_DEPTH));
+        gluggPopMatrix();
+
+        branch_height += rand_range(BRANCH_DENSITY.x, BRANCH_DENSITY.y);
+        if(branch_height >= tree_height){
+            break;
+        }
+    }
+
+    /*
     gluggTranslate(0, 2, 0);
     gluggPushMatrix();
     // rotation around trunk
@@ -182,6 +224,8 @@ gluggModel MakeTree()
     gluggPopMatrix();
 
     //gluggTranslate()
+
+    */
 
 	// Between gluggBegin and gluggBuildModel, call MakeCylinderAlt plus glugg transformations
 	// to create a tree.
