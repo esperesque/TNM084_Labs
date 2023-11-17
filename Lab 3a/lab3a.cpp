@@ -5,12 +5,14 @@
 // Adapted to lastest GLUGG.
 
 #define MAIN
+#include <iostream>
 #include "MicroGlut.h"
 #include "GL_utilities.h"
 #include "VectorUtils4.h"
 #include "LittleOBJLoaderX.h"
 #include "LoadTGA.h"
 #include "glugg.h"
+#include "simplexnoise1234.h"
 
 //#include <iostream>
 
@@ -88,6 +90,41 @@ GLuint indices2[] = {	0,3,2, 0,2,1};
 
 // THIS IS WHERE YOUR WORK GOES!
 
+long long seed = 12744274;
+
+// Uses Blum Blum Shub to generate a random float in the range [0, 1]
+float randf(){
+    long m1 = 6229; // long is 32 bits
+    long m2 = 7757;
+
+    long long s = (seed*seed) % (m1*m2);
+    seed = s;
+    return((float)s / (m1*m2));
+}
+
+// Uses the randf function to generate a random angle between 0 and 2*pi radians
+float rand_ang(){
+    float pi = 3.14; // TODO: look up the other digits
+    return(pi * 2 * randf());
+}
+
+void TestRng(int iterations){
+    int over = 0;
+    int under = 0;
+    for(int i = 0; i < iterations; i++){
+        float r = randf();
+        if(r >= 0.9 && r <= 1.0){
+            over++;
+        }
+        else if(r >= 0 && r <= 0.1){
+            under++;
+        }
+        //std::cout << "Random number: " << randf() << "\n";
+    }
+    std::cout << "Values between 0.9 and 1.0: " << over << "\n";
+    std::cout << "Values between 0.0 and 0.1: " << under << "\n";
+}
+
 void MakeBranch(int depth, int variation){
     // Rescale
     gluggScale(0.75, 0.75, 0.75);
@@ -117,10 +154,39 @@ gluggModel MakeTree()
 
 	gluggBegin(GLUGG_TRIANGLES);
 
+    // Try to make a tree without loops/recursion to figure out the logic
+
+    // rand test
+    TestRng(500);
+
+    MakeCylinderAlt(20, 2, 0.2, 0.2);
+    gluggPushMatrix();
+    gluggTranslate(0, 2, 0);
+    MakeCylinderAlt(20, 3, 0.1, 0.2);
+    gluggPopMatrix();
+
+    gluggTranslate(0, 2, 0);
+    gluggPushMatrix();
+    // rotation around trunk
+    gluggRotate(rand_ang(), 0, 1.0, 0);
+    gluggRotate(1.0, 1.0, 0, 0);
+    MakeCylinderAlt(10, 2.5, 0.01, 0.1);
+    gluggPopMatrix();
+
+    gluggTranslate(0, 0.5, 0);
+    gluggPushMatrix();
+    // rotation around trunk
+    gluggRotate(rand_ang(), 0, 1.0, 0);
+    gluggRotate(1.0, 1.0, 0, 0);
+    MakeCylinderAlt(10, 2.5, 0.01, 0.1);
+    gluggPopMatrix();
+
+    //gluggTranslate()
+
 	// Between gluggBegin and gluggBuildModel, call MakeCylinderAlt plus glugg transformations
 	// to create a tree.
 
-	int depth = 6;
+	//int depth = 6;
 
 	// Create the trunk
 	//MakeCylinderAlt(20, 2, 0.2, 0.2);
@@ -129,7 +195,7 @@ gluggModel MakeTree()
 
 	// Step 1: Make three diverging branches
 
-	MakeBranch(depth, 0);
+	//MakeBranch(depth, 0);
 
 	/*
 	for(int i = 0; i <= depth; i++){
@@ -153,6 +219,8 @@ gluggModel MakeTree()
 
 	return gluggBuildModel(0);
 }
+
+
 
 gluggModel tree;
 

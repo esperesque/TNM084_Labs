@@ -53,6 +53,10 @@
 		</Unit>
 		<Unit filename="glugg.h" />
 		<Unit filename="lab3a.cpp" />
+		<Unit filename="simplexnoise1234.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="simplexnoise1234.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
