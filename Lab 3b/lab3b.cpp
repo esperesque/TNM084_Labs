@@ -32,7 +32,7 @@ GLuint grasstex;
 // Reference to shader programs
 GLuint phongShader, texShader;
 
-#define kTerrainSize 64
+#define kTerrainSize 512
 #define kPolySize 0.5
 
 // Terrain data. To be initialized in MakeTerrain or in the shader
@@ -45,6 +45,39 @@ GLuint indices[(kTerrainSize-1)*(kTerrainSize-1)*3*2];
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
+// Implementation of multi-octave Perlin partially from https://github.com/simondevyoutube/ProceduralTerrain_Part2/tree/master/src
+float PerlinFBM(float x, float z){
+    int octaves = 5;
+    float scale = 1.0;
+    float lacunarity = 2.0;
+    float frequency = 0.02;
+    float persistence = 2.0;
+    float amplitude = 6.0;
+    float gain = pow(2.0, -persistence);
+    float norm_factor = 0;
+
+    float xs = x * scale;
+    float zs = z * scale;
+
+    float val = 0.0;
+
+    for(int i = 0; i < octaves; i++){
+        float noise = snoise3(xs*frequency, zs*frequency, octaves);
+
+        val += noise * amplitude;
+
+        // Update values for the next pass
+        norm_factor += amplitude;
+        frequency *= lacunarity;
+        amplitude *= gain;
+    }
+
+    // normalize
+    //val /= norm_factor;
+
+    return val;
+}
+
 void MakeTerrain()
 {
 	// TO DO: This is where your terrain generation goes if on CPU.
@@ -53,12 +86,7 @@ void MakeTerrain()
 	{
 		int ix = z * kTerrainSize + x;
 
-		#define bumpHeight 0.5
-		#define bumpWidth 2.0
-
-		// squared distance to center
-		float h = ( (x - kTerrainSize/2)/bumpWidth * (x - kTerrainSize/2)/bumpWidth +  (z - kTerrainSize/2)/bumpWidth * (z - kTerrainSize/2)/bumpWidth );
-		float y = MAX(0, 3-h) * bumpHeight;
+		float y = PerlinFBM(x, z);
 
 		vertices[ix] = vec3(x * kPolySize, y, z * kPolySize);
 		texCoords[ix] = vec2(x, z);
@@ -87,7 +115,17 @@ void MakeTerrain()
 	for (int x = 0; x < kTerrainSize; x++)
 	for (int z = 0; z < kTerrainSize; z++)
 	{
-		normals[z * kTerrainSize + x] = SetVec3(0,1,0);
+	    if(x == 0 || x == kTerrainSize-1 || z == 0 || z == kTerrainSize-1){
+            normals[z * kTerrainSize + x] = SetVec3(0,1,0);
+	    }
+	    else{
+            vec3 L = vertices[z*kTerrainSize + x-1];
+            vec3 R = vertices[z*kTerrainSize + x+1];
+            vec3 F = vertices[(z-1)*kTerrainSize + x];
+            vec3 B = vertices[(z+1)*kTerrainSize + x];
+            vec3 norm = normalize(vec3(2*(R.y-L.y), -4, 2*(B.y-F.y)));
+            normals[z * kTerrainSize + x] = SetVec3(norm.x, norm.y, norm.z);
+	    }
 	}
 }
 

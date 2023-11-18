@@ -265,7 +265,7 @@
 
 1619241556 c:\_school\procedural\tnm084 labs\lab 3a\simplexnoise1234.h
 
-1699268959 source:c:\_dev\cpp\tnm084_labs\common\gl_utilities.c
+1675154278 source:c:\_dev\cpp\tnm084_labs\common\gl_utilities.c
 	<Windows.h>
 	<stdlib.h>
 	<stdio.h>
@@ -273,14 +273,14 @@
 	<string.h>
 	"GL_utilities.h"
 
-1699268959 c:\_dev\cpp\tnm084_labs\common\gl_utilities.h
+1601082610 c:\_dev\cpp\tnm084_labs\common\gl_utilities.h
 	<OpenGL/gl3.h>
 	"glew.h"
 	<GL/gl.h>
 	<GL/gl.h>
 	<stdlib.h>
 
-1699268959 c:\_dev\cpp\tnm084_labs\common\windows\glew.h
+1504151932 c:\_dev\cpp\tnm084_labs\common\windows\glew.h
 	<stddef.h>
 	<inttypes.h>
 	<stdint.h>
@@ -289,10 +289,10 @@
 	<OpenGL/glu.h>
 	<GL/glu.h>
 
-1699268959 source:c:\_dev\cpp\tnm084_labs\common\loadtga.c
+1675156644 source:c:\_dev\cpp\tnm084_labs\common\loadtga.c
 	"LoadTGA.h"
 
-1699268959 c:\_dev\cpp\tnm084_labs\common\loadtga.h
+1668936494 c:\_dev\cpp\tnm084_labs\common\loadtga.h
 	<OpenGL/gl3.h>
 	"glew.h"
 	<GL/gl.h>
@@ -300,7 +300,7 @@
 	<stdlib.h>
 	<string.h>
 
-1699268959 source:c:\_dev\cpp\tnm084_labs\common\windows\glew.c
+1504151932 source:c:\_dev\cpp\tnm084_labs\common\windows\glew.c
 	"glew.h"
 	"wglew.h"
 	<GL/glxew.h>
@@ -314,10 +314,10 @@
 	<dlfcn.h>
 	<mach-o/dyld.h>
 
-1699268959 c:\_dev\cpp\tnm084_labs\common\windows\wglew.h
+1504151932 c:\_dev\cpp\tnm084_labs\common\windows\wglew.h
 	<windows.h>
 
-1699268959 source:c:\_dev\cpp\tnm084_labs\common\windows\microglut.c
+1699188795 source:c:\_dev\cpp\tnm084_labs\common\windows\microglut.c
 	<windows.h>
 	"glew.h"
 	<gl/gl.h>
@@ -326,9 +326,9 @@
 	<io.h>
 	<fcntl.h>
 
-1699268959 c:\_dev\cpp\tnm084_labs\common\windows\microglut.h
+1621844928 c:\_dev\cpp\tnm084_labs\common\windows\microglut.h
 
-1700224900 source:c:\_dev\cpp\tnm084_labs\lab 3a\lab3a.cpp
+1700315190 source:c:\_dev\cpp\tnm084_labs\lab 3a\lab3a.cpp
 	<iostream>
 	"MicroGlut.h"
 	"GL_utilities.h"
@@ -338,14 +338,14 @@
 	"glugg.h"
 	"simplexnoise1234.h"
 
-1699268959 c:\_dev\cpp\tnm084_labs\common\vectorutils4.h
+1694452438 c:\_dev\cpp\tnm084_labs\common\vectorutils4.h
 	<OpenGL/gl3.h>
 	"glew.h"
 	<GL/gl.h>
 	<math.h>
 	<stdio.h>
 
-1699268959 c:\_dev\cpp\tnm084_labs\common\littleobjloaderx.h
+1699136272 c:\_dev\cpp\tnm084_labs\common\littleobjloaderx.h
 	<OpenGL/gl3.h>
 	"glew.h"
 	<GL/gl.h>
@@ -356,7 +356,7 @@
 	<math.h>
 	"VectorUtils4.h"
 
-1700032591 c:\_dev\cpp\tnm084_labs\lab 3a\glugg.h
+1668936412 c:\_dev\cpp\tnm084_labs\lab 3a\glugg.h
 	"VectorUtils4.h"
 	<math.h>
 	<stdlib.h>
@@ -366,8 +366,8 @@
 	"VectorUtils4.h"
 	"glugg.h"
 
-1700223370 c:\_dev\cpp\tnm084_labs\lab 3a\simplexnoise1234.h
+1619241556 c:\_dev\cpp\tnm084_labs\lab 3a\simplexnoise1234.h
 
-1700223370 source:c:\_dev\cpp\tnm084_labs\lab 3a\simplexnoise1234.c
+1383935926 source:c:\_dev\cpp\tnm084_labs\lab 3a\simplexnoise1234.c
 	"simplexnoise1234.h"
 
