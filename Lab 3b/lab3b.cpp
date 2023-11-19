@@ -120,22 +120,45 @@ void MakeTerrain()
 	for (int x = 0; x < kTerrainSize; x++)
 	for (int z = 0; z < kTerrainSize; z++)
 	{
-	    if(x == 0 || x == kTerrainSize-1 || z == 0 || z == kTerrainSize-1){
-            normals[z * kTerrainSize + x] = SetVec3(0,1,0);
+	    vec3 L; // Left neighbor (negative x-axis)
+	    vec3 R; // Right neighbor (positive x-axis)
+	    vec3 F; // Front neighbor (negative z-axis)
+	    vec3 B; // Back neighbor (positive z-axis)
+
+	    // In case of edge/corner vertices, use the normal of the central vertex
+	    // in place of the neighbor vertex that is out of bounds
+	    // Equivalent to "replicate padding" in image processing
+
+	    if(x == 0){
+            L = vertices[z*kTerrainSize + x];
+            R = vertices[z*kTerrainSize + x+1];
+	    }
+	    else if(x == kTerrainSize - 1){
+            L = vertices[z*kTerrainSize + x-1];
+            R = vertices[z*kTerrainSize + x];
 	    }
 	    else{
-            vec3 L = vertices[z*kTerrainSize + x-1];
-            vec3 R = vertices[z*kTerrainSize + x+1];
-            vec3 F = vertices[(z-1)*kTerrainSize + x];
-            vec3 B = vertices[(z+1)*kTerrainSize + x];
-            vec3 norm = normalize(vec3(2*(R.y-L.y), -4, 2*(B.y-F.y)));
-            norm = -norm; // I did something wrong
-            normals[z * kTerrainSize + x] = SetVec3(norm.x, norm.y, norm.z);
-            //std::cout << "Normal is: " << norm.x << ", " << norm.y << ", " << norm.z << "\n";
+            L = vertices[z*kTerrainSize + x-1];
+            R = vertices[z*kTerrainSize + x+1];
 	    }
-	}
 
-    //glUniform1i(glGetUniformLocation(program, "hmap"), t);
+	    if(z == 0){
+            F = vertices[z*kTerrainSize + x];
+            B = vertices[(z+1)*kTerrainSize + x];
+	    }
+	    else if(z == kTerrainSize - 1){
+            F = vertices[(z-1)*kTerrainSize + x];
+            B = vertices[z*kTerrainSize + x];
+	    }
+	    else{
+            F = vertices[(z-1)*kTerrainSize + x];
+            B = vertices[(z+1)*kTerrainSize + x];
+	    }
+
+	    vec3 norm = normalize(vec3(2*(R.y-L.y), -4, 2*(B.y-F.y)));
+        norm = -norm; // I did something wrong
+        normals[z * kTerrainSize + x] = SetVec3(norm.x, norm.y, norm.z);
+	}
 }
 
 void init(void)
@@ -212,7 +235,7 @@ void animate(int t){
     //sun_pos[1] = 10000.0;
     //sun_pos[2] = 0.0;
 
-    vec3 sun_pos = vec3(100.0, 100.0, 0.0);
+    vec3 sun_pos = vec3(10000.0, 10000.0, 0.0);
     float th = 0.001*t;
     sun_pos = y_rot(sun_pos, th);
 
