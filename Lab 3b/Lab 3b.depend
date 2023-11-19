@@ -271,7 +271,8 @@
 
 1621844928 c:\_dev\cpp\tnm084_labs\common\windows\microglut.h
 
-1700317587 source:c:\_dev\cpp\tnm084_labs\lab 3b\lab3b.cpp
+1700398470 source:c:\_dev\cpp\tnm084_labs\lab 3b\lab3b.cpp
+	<iostream>
 	"MicroGlut.h"
 	"GL_utilities.h"
 	"VectorUtils4.h"
@@ -289,7 +290,7 @@
 	<math.h>
 	<stdio.h>
 
-1699136272 c:\_dev\cpp\tnm084_labs\common\littleobjloaderx.h
+1700326824 c:\_dev\cpp\tnm084_labs\common\littleobjloaderx.h
 	<OpenGL/gl3.h>
 	"glew.h"
 	<GL/gl.h>

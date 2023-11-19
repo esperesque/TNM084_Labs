@@ -13,6 +13,7 @@
 // If you want to use gradient noise, use the code from Lab 1.
 
 #define MAIN
+#include <iostream>
 #include "MicroGlut.h"
 #include "GL_utilities.h"
 #include "VectorUtils4.h"
@@ -28,6 +29,7 @@
 mat4 projectionMatrix;
 Model *floormodel;
 GLuint grasstex;
+GLuint rocktex;
 
 // Reference to shader programs
 GLuint phongShader, texShader;
@@ -80,6 +82,8 @@ float PerlinFBM(float x, float z){
 
 void MakeTerrain()
 {
+    //GLfloat heightmap[kTerrainSize*kTerrainSize];
+
 	// TO DO: This is where your terrain generation goes if on CPU.
 	for (int x = 0; x < kTerrainSize; x++)
 	for (int z = 0; z < kTerrainSize; z++)
@@ -91,6 +95,7 @@ void MakeTerrain()
 		vertices[ix] = vec3(x * kPolySize, y, z * kPolySize);
 		texCoords[ix] = vec2(x, z);
 		normals[ix] = vec3(0,1,0);
+		//heightmap[ix] = y;
 	}
 
 	// Make indices
@@ -124,9 +129,13 @@ void MakeTerrain()
             vec3 F = vertices[(z-1)*kTerrainSize + x];
             vec3 B = vertices[(z+1)*kTerrainSize + x];
             vec3 norm = normalize(vec3(2*(R.y-L.y), -4, 2*(B.y-F.y)));
+            norm = -norm; // I did something wrong
             normals[z * kTerrainSize + x] = SetVec3(norm.x, norm.y, norm.z);
+            //std::cout << "Normal is: " << norm.x << ", " << norm.y << ", " << norm.z << "\n";
 	    }
 	}
+
+    //glUniform1i(glGetUniformLocation(program, "hmap"), t);
 }
 
 void init(void)
@@ -157,13 +166,22 @@ void init(void)
 	glUseProgram(phongShader);
 	glUniformMatrix4fv(glGetUniformLocation(phongShader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glUniform1i(glGetUniformLocation(phongShader, "tex"), 0); // Texture unit 0
+	glUniform1i(glGetUniformLocation(phongShader, "rock_tex"), 1); // Texture unit 1
 
 	glUseProgram(texShader);
 	glUniformMatrix4fv(glGetUniformLocation(texShader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glUniform1i(glGetUniformLocation(texShader, "tex"), 0); // Texture unit 0
+	glUniform1i(glGetUniformLocation(texShader, "rock_tex"), 1); // Texture unit 0
 
-	LoadTGATextureSimple("grass.tga", &grasstex);
+	LoadTGATextureSimple("grass2.tga", &grasstex);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, grasstex);
+	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_S,	GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_T,	GL_REPEAT);
+
+	glActiveTexture(GL_TEXTURE1);
+	LoadTGATextureSimple("rock4.tga", &rocktex);
+	glBindTexture(GL_TEXTURE_2D, rocktex);
 	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_S,	GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_T,	GL_REPEAT);
 
@@ -173,6 +191,41 @@ void init(void)
 vec3 campos = vec3(kTerrainSize*kPolySize/4, 1.5, kTerrainSize*kPolySize/4);
 vec3 forward = vec3(8, 0, 8);
 vec3 up = vec3(0, 1, 0);
+
+vec3 y_rot(vec3 v, float th){
+    mat3 rm;
+    rm.m[0] = cos(th);    rm.m[1] = 0;      rm.m[2] = sin(th);
+    rm.m[3] = 0;          rm.m[4] = 1;      rm.m[5] = 0;
+    rm.m[6] = -sin(th);   rm.m[7] = 0;      rm.m[8] = cos(th);
+
+    return MultMat3Vec3(rm, v);
+}
+
+// Called approximately 60 times per second
+void animate(int t){
+    //std::cout << t << "\n";
+    glutTimerFunc(16, animate, t+16);
+    glUniform1i(glGetUniformLocation(texShader, "time_ms"), t);
+
+    //GLfloat sun_pos; // = GLfloat([10000.0, 10000.0, 0]);
+    //sun_pos[0] = 10000.0;
+    //sun_pos[1] = 10000.0;
+    //sun_pos[2] = 0.0;
+
+    vec3 sun_pos = vec3(100.0, 100.0, 0.0);
+    float th = 0.001*t;
+    sun_pos = y_rot(sun_pos, th);
+
+    glUniform1f(glGetUniformLocation(texShader, "sun_x"), sun_pos.x);
+    glUniform1f(glGetUniformLocation(texShader, "sun_y"), sun_pos.y);
+    glUniform1f(glGetUniformLocation(texShader, "sun_z"), sun_pos.z);
+
+    // This line should send a vec3 to the fragment shader. however, it does not work.
+    //glUniform3fv(texShader, sun_pos.size(), reinterpret_cast<GLfloat *>(sun_pos.data()));
+    //glUniform1fv(glGetUniformLocation(texShader, "sun_pos"), sun_pos);
+
+    glutPostRedisplay();
+}
 
 void display(void)
 {
@@ -225,6 +278,7 @@ void display(void)
 	worldToView = lookAtv(campos, campos + forward, up);
 
 	glBindTexture(GL_TEXTURE_2D, grasstex); // The texture is not used but provided as example
+	glBindTexture(GL_TEXTURE_2D, rocktex);
 	// Floor
 	GLuint shader = texShader;
 	glUseProgram(shader);
@@ -248,6 +302,7 @@ int main(int argc, char *argv[])
 	glutInitWindowSize(640,360);
 	glutCreateWindow ("Lab 3b");
 	glutRepeatingTimer(20);
+	glutTimerFunc(16, animate, 0);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keys);
 	init ();
