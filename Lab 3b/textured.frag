@@ -98,7 +98,7 @@ void main(void)
 
         shade = 0.5 + 0.5*light;
         //shade = 0.5 + 0.5*min((n.y + n.z), 1.0);
-        shade += (1.0 - smoothstep(0.0, 3.0, height));
+        shade += (1.0 - smoothstep(0.0, 3.0, exPos.y));
         shade = min(shade, 1.0);
 	}
 
