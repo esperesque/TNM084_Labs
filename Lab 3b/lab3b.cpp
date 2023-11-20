@@ -155,8 +155,11 @@ void MakeTerrain()
             B = vertices[(z+1)*kTerrainSize + x];
 	    }
 
-	    vec3 norm = normalize(vec3(2*(R.y-L.y), -4, 2*(B.y-F.y)));
-        norm = -norm; // I did something wrong
+	    // Cross product method suggested in Le6
+	    vec3 v1 = (R - L);
+	    vec3 v2 = (B - F);
+	    vec3 norm = normalize(cross(v2, v1));
+
         normals[z * kTerrainSize + x] = SetVec3(norm.x, norm.y, norm.z);
 	}
 }

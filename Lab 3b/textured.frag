@@ -50,7 +50,7 @@ vec3 grass(vec2 st, vec3 norm){
     vec3 grass_color = texture(tex, st*0.2).xyz;
 
     float r = dot(norm, vec3(0,1.0,0));
-    r = smoothstep(0.85, 0.95, r); // shows rock if r is [0, 0.5]
+    r = smoothstep(0.5, 0.8, r); //
 
     return(mix(rock(st), grass_color, r));
 
