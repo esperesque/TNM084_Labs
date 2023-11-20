@@ -116,7 +116,7 @@ void main(void)
 
 	//color = t.xyz;
 	//shade = 1;
-    outColor = vec4(color * shade * shade, 1.0); // Over-emphasized fake light
+    outColor = vec4(color * shade, 1.0); // Over-emphasized fake light
 
 //	outColor = vec4(texCoord.s, texCoord.t, 0, 1);
 //	outColor = vec4(n.x, n.y, n.z, 1);
