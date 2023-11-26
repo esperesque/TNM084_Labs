@@ -71,9 +71,24 @@ float noise(vec3 st)
           	);
 }
 
+// rotation around arbitrary axis
+vec3 rot(vec3 v, vec3 axis, float angle){
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float ic = 1.0 - c;
+
+    float x = axis.x;
+    float y = axis.y;
+    float z = axis.z;
+
+    mat3 rm = mat3(c+x*x*ic, y*x*ic+z*s, x*z*ic-y*s, x*y*ic-z*s, c+y*y*ic, z*y*ic+x*s, x*z*ic+y*s, y*z*ic-x*s, c+z*z*ic);
+    return rm*v;
+}
+
 float fbm(vec3 st){
     int octaves = 3;
-    float amplitude = 0.1;
+    float amplitude = 0.2;
     float lacunarity = 2.0;
     float frequency = 3.0;
     float persistence = 5.0;
@@ -99,6 +114,45 @@ void computeVertex(int nr)
 	vec3 p, v1, v2, v3, p1, p2, p3, s1, s2, n;
 
 	p = vec3(gl_in[nr].gl_Position);
+
+	// Calculate normals
+	vec3 n1 = normalize(p); // This is the position-based normal
+	vec3 sf; // Vector parallel to surface
+	// Given a position and a normal, the equation for the plane is a(x-x1)+b(y-y1)+c(z-z1) = 0
+	// Setting x = 0 and y = 0 gives n1.x(1-p.x)+n1.y(1-p.y)+n1.z(z-p.z) = 0
+	// nl.z(z-p.z) = -nl.x(1-p.x)-nl.y(1-p.y)
+	// z-p.z = (-nl.x(1-p.x)-nl.y(1-p.y)) / nl.z <=> z = ((-nl.x(-p.x)-nl.y(-p.y)) / nl.z) + p.z - will not work if nl.z = 0
+	if(n1.x != 0){
+        sf = vec3(0, 0, 0);
+        sf.x = ((n1.z*p.z+n1.y*p.y) / n1.x) + p.x;
+	}
+	else if(n1.y != 0){
+	    sf = vec3(0, 0, 0);
+        sf.y = ((n1.z*p.z+n1.x*p.x) / n1.y) + p.y;
+	}
+	else{
+        sf = vec3(0, 0, 0);
+        sf.z = ((n1.y*p.y+n1.x*p.x) / n1.z) + p.z;
+	}
+
+	//sf = sf - p;
+    sf = normalize(sf);
+    float surface_offset = 0.1;
+    sf *= surface_offset;
+    p1 = sf;
+    p2 = rot(sf, n1, (2.0/3.0)*3.14);
+    p3 = rot(sf, n1, (4.0/3.0)*3.14);
+
+    p1 *= (1.0 + fbm(p1));
+    p2 *= (1.0 + fbm(p2));
+    p3 *= (1.0 + fbm(p3));
+
+    // https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
+
+    vec3 u = p2 - p1;
+    vec3 v = p3 - p1;
+    n = vec3(u.y*v.z - u.z*v.y, u.z*v.x-u.x*v.z, u.x*v.y-u.y*v.x);
+
 	// Add interesting code here
 	p = normalize(p);
 
@@ -108,7 +162,7 @@ void computeVertex(int nr)
 
     gsTexCoord = teTexCoord[0];
 
-	n = teNormal[nr]; // This is not the normal you are looking for. Move along!
+	//n = teNormal[nr]; // This is not the normal you are looking for. Move along!
     gsNormal = mat3(camMatrix * mdlMatrix) * n;
     EmitVertex();
 }
