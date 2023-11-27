@@ -9,6 +9,7 @@ in vec3 teNormal[3];
 out vec2 gsTexCoord;
 out vec3 gsNormal;
 out float steep;
+out float height;
 uniform sampler2D tex;
 
 uniform mat4 projMatrix;
@@ -117,43 +118,29 @@ void computeVertex(int nr)
 	p = vec3(gl_in[nr].gl_Position);
 
 	// Calculate normals
-	vec3 n1 = normalize(p); // This is the position-based normal
-	vec3 sf; // Vector parallel to surface
-	// Given a position and a normal, the equation for the plane is a(x-x1)+b(y-y1)+c(z-z1) = 0
-	// Setting x = 0 and y = 0 gives n1.x(1-p.x)+n1.y(1-p.y)+n1.z(z-p.z) = 0
-	// nl.z(z-p.z) = -nl.x(1-p.x)-nl.y(1-p.y)
-	// z-p.z = (-nl.x(1-p.x)-nl.y(1-p.y)) / nl.z <=> z = ((-nl.x(-p.x)-nl.y(-p.y)) / nl.z) + p.z - will not work if nl.z = 0
-	if(n1.x != 0){
-        sf = vec3(0, 0, 0);
-        sf.x = ((n1.z*p.z+n1.y*p.y) / n1.x) + p.x;
-	}
-	else if(n1.y != 0){
-	    sf = vec3(0, 0, 0);
-        sf.y = ((n1.z*p.z+n1.x*p.x) / n1.y) + p.y;
+
+	// Simon's method
+
+	float scale_factor = 0.05;
+	vec3 p_n = normalize(p) * scale_factor;
+
+	if(abs(dot(normalize(p_n), vec3(1,0,0))) >= 0.8){
+        // p_n is very close to the x-axis, use a different vector
+        v1 = cross(p_n, vec3(0,1,0)*scale_factor);
 	}
 	else{
-        sf = vec3(0, 0, 0);
-        sf.z = ((n1.y*p.y+n1.x*p.x) / n1.z) + p.z;
+        v1 = cross(p_n, vec3(1,0,0)*scale_factor);
 	}
-
-	//sf = sf - p;
-    sf = normalize(sf);
-    float surface_offset = 1.0;
-    sf *= surface_offset;
-    p1 = sf;
-    p2 = rot(sf, n1, (2.0/3.0)*3.14);
-    p3 = rot(sf, n1, (4.0/3.0)*3.14);
-
-    p1 *= (1.0 + fbm(p1));
-    p2 *= (1.0 + fbm(p2));
-    p3 *= (1.0 + fbm(p3));
-
-    // https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
-
-    vec3 u = p2 - p1;
-    vec3 v = p3 - p1;
-    n = vec3(u.y*v.z - u.z*v.y, u.z*v.x-u.x*v.z, u.x*v.y-u.y*v.x);
-    n = normalize(n);
+	p1 = p + v1;
+	p1 *= (1.0 + fbm(p1));
+	v2 = cross(p_n, v1);
+	p2 = p + v2;
+	p2 *= (1.0 + fbm(p2));
+	v3 = -v1-v2;
+	p3 = p + v3;
+	p3 *= (1.0 + fbm(p3));
+	n = cross(p1-p3,p2-p1);
+	n = normalize(n);
 
 	// Add interesting code here
 	p = normalize(p);
@@ -161,6 +148,7 @@ void computeVertex(int nr)
     steep = (1.0 - dot(p, n));
 
 	p *= (1.0 + fbm(p));
+	height = sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
 
 	gl_Position = projMatrix * camMatrix * mdlMatrix * vec4(p, 1.0);
 
@@ -175,7 +163,8 @@ void computeVertex(int nr)
     //steep = 0.8;
 
 	//n = teNormal[nr]; // This is not the normal you are looking for. Move along!
-    gsNormal = mat3(camMatrix * mdlMatrix) * n;
+	gsNormal = n;
+    //gsNormal = mat3(camMatrix * mdlMatrix) * n;
     EmitVertex();
 }
 
