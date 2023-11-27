@@ -8,6 +8,7 @@ in vec2 teTexCoord[3];
 in vec3 teNormal[3];
 out vec2 gsTexCoord;
 out vec3 gsNormal;
+out float steep;
 uniform sampler2D tex;
 
 uniform mat4 projMatrix;
@@ -137,7 +138,7 @@ void computeVertex(int nr)
 
 	//sf = sf - p;
     sf = normalize(sf);
-    float surface_offset = 0.1;
+    float surface_offset = 1.0;
     sf *= surface_offset;
     p1 = sf;
     p2 = rot(sf, n1, (2.0/3.0)*3.14);
@@ -152,15 +153,26 @@ void computeVertex(int nr)
     vec3 u = p2 - p1;
     vec3 v = p3 - p1;
     n = vec3(u.y*v.z - u.z*v.y, u.z*v.x-u.x*v.z, u.x*v.y-u.y*v.x);
+    n = normalize(n);
 
 	// Add interesting code here
 	p = normalize(p);
+	// Calculate steep parameter
+    steep = (1.0 - dot(p, n));
 
 	p *= (1.0 + fbm(p));
 
 	gl_Position = projMatrix * camMatrix * mdlMatrix * vec4(p, 1.0);
 
-    gsTexCoord = teTexCoord[0];
+	// Calculate UV coordinates
+	float tu = atan(n.x, n.z) / (2*3.14) + 0.5;
+	float tv = n.y*0.5 + 0.5;
+
+	gsTexCoord = vec2(tu, tv);
+    //gsTexCoord = teTexCoord[0];
+
+
+    //steep = 0.8;
 
 	//n = teNormal[nr]; // This is not the normal you are looking for. Move along!
     gsNormal = mat3(camMatrix * mdlMatrix) * n;

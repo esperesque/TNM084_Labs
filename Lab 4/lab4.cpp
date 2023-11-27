@@ -94,6 +94,9 @@ Model *cube;
 // Reference to shader program
 GLuint shader;
 
+GLuint grasstex;
+GLuint rocktex;
+
 void init(void)
 {
 	// GL inits
@@ -123,6 +126,22 @@ void init(void)
 	// Upload matrices that we do not intend to change.
 	glUniformMatrix4fv(glGetUniformLocation(shader, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+
+	// Upload textures
+	glUniform1i(glGetUniformLocation(shader, "grass_tex"), 0); // Texture unit 0
+	glUniform1i(glGetUniformLocation(shader, "rock_tex"), 1); // Texture unit 1
+
+	LoadTGATextureSimple("grass.tga", &grasstex);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, grasstex);
+	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_S,	GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_T,	GL_REPEAT);
+
+	glActiveTexture(GL_TEXTURE1);
+	LoadTGATextureSimple("rock.tga", &rocktex);
+	glBindTexture(GL_TEXTURE_2D, rocktex);
+	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_S,	GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D,	GL_TEXTURE_WRAP_T,	GL_REPEAT);
 }
 
 void display(void)
