@@ -227,3 +227,61 @@
 	<math.h>
 	"VectorUtils4.h"
 
+1675154278 source:c:\_dev\cpp\tnm084_labs\common\gl_utilities.c
+	<Windows.h>
+	<stdlib.h>
+	<stdio.h>
+	<stddef.h>
+	<string.h>
+	"GL_utilities.h"
+
+1601082610 c:\_dev\cpp\tnm084_labs\common\gl_utilities.h
+	<OpenGL/gl3.h>
+	"glew.h"
+	<GL/gl.h>
+	<GL/gl.h>
+	<stdlib.h>
+
+1504151932 c:\_dev\cpp\tnm084_labs\common\windows\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<Availability.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1504151932 source:c:\_dev\cpp\tnm084_labs\common\windows\glew.c
+	"glew.h"
+	"wglew.h"
+	<GL/glxew.h>
+	<stddef.h>
+	<dlfcn.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdlib.h>
+	<string.h>
+	<AvailabilityMacros.h>
+	<dlfcn.h>
+	<mach-o/dyld.h>
+
+1504151932 c:\_dev\cpp\tnm084_labs\common\windows\wglew.h
+	<windows.h>
+
+1478269306 source:c:\_dev\cpp\tnm084_labs\lab1_2\noise\cellular.c
+	<math.h>
+	<stdio.h>
+	"cellular.h"
+
+1619241508 c:\_dev\cpp\tnm084_labs\lab1_2\noise\cellular.h
+
+1383935336 source:c:\_dev\cpp\tnm084_labs\lab1_2\noise\noise1234.c
+	"noise1234.h"
+
+1619241466 c:\_dev\cpp\tnm084_labs\lab1_2\noise\noise1234.h
+
+1383935926 source:c:\_dev\cpp\tnm084_labs\lab1_2\noise\simplexnoise1234.c
+	"simplexnoise1234.h"
+
+1619241556 c:\_dev\cpp\tnm084_labs\lab1_2\noise\simplexnoise1234.h
+

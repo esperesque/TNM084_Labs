@@ -118,6 +118,13 @@ void main(void)
 	{
 	    float time = time_ms / 1000.0; // time elapsed in seconds
 
+	    float r = sin(noise(texCoord*1.2)*50+time);
+	    float g = sin(noise(texCoord.yx)*20+time*0.7);
+	    float b = sin(noise(texCoord*vec2(3.1, 8.5))*45+time*0.95);
+
+	    out_Color = vec4(r*0.8, g*0.5, b, 1.0);
+
+	    /*
 		vec2 st = texCoord;
 		vec2 st2 = texCoord;
 		vec2 st3 = texCoord;
@@ -141,6 +148,7 @@ void main(void)
 		color = mix(color, color3, 0.5);
 		//vec3 color = color1;
 		out_Color = vec4(color, 1.0);
+		*/
 	}
 	else
 		out_Color = texture(tex, texCoord);
